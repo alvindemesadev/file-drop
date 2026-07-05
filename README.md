@@ -49,13 +49,13 @@ To share from a specific LAN IP, the dev server already advertises the network U
 npm run serve
 ```
 
-This builds the app and serves it on `http://0.0.0.0:3001`. Other devices on the same network connect to `http://<YOUR_LAN_IP>:3001`.
+Builds and starts on the first available port starting at 3001. Other devices connect to `http://<YOUR_LAN_IP>:<PORT>` (the port is printed in the terminal).
 
-If port 3001 is taken, change it:
+To use a different starting port:
 
 ```bash
-# next start -p <port>
-npx next start -H 0.0.0.0 -p 8080
+PORT=8080 npm run serve    # Mac/Linux
+$env:PORT=8080; npm run serve  # Windows PowerShell
 ```
 
 ## Usage
