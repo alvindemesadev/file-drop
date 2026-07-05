@@ -20,6 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "FileDrop - Simple File Sharing",
   description: "Upload files and share them instantly with a link",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
