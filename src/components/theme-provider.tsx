@@ -23,7 +23,7 @@ const ThemeContext = createContext<{
 }>({ theme: 'light', setTheme: () => {} });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = useSyncExternalStore(subscribe, getSnapshot, () => 'light');
+  const theme = useSyncExternalStore(subscribe, getSnapshot, () => 'light' as Theme);
 
   const setTheme = (newTheme: Theme) => {
     localStorage.setItem('theme', newTheme);
