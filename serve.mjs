@@ -1,5 +1,10 @@
 import { createServer } from 'net';
 import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const nextCli = join(__dirname, 'node_modules', 'next', 'dist', 'bin', 'next');
 
 const PREFERRED = Number(process.env.PORT) || 3001;
 const MAX_ATTEMPTS = 20;
@@ -21,7 +26,7 @@ async function findFreePort(start) {
 }
 
 const port = await findFreePort(PREFERRED);
-const child = spawn('npx', ['next', 'start', '-H', '0.0.0.0', '-p', String(port)], {
+const child = spawn(process.execPath, [nextCli, 'start', '-H', '0.0.0.0', '-p', String(port)], {
   stdio: 'inherit',
   env: { ...process.env },
 });
