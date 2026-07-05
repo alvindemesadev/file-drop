@@ -26,7 +26,7 @@ async function findFreePort(start) {
 }
 
 const port = await findFreePort(PREFERRED);
-const child = spawn(process.execPath, [nextCli, 'start', '-H', '0.0.0.0', '-p', String(port)], {
+spawn(process.execPath, [nextCli, 'start', '-H', '0.0.0.0', '-p', String(port)], {
   stdio: 'inherit',
   env: { ...process.env },
 });

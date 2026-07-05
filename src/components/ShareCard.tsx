@@ -34,7 +34,7 @@ export default function ShareCard({ downloadUrl, fileName, fileSize, fileCount, 
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    inputRef.current?.select();
+    if (window.innerWidth >= 640) inputRef.current?.select();
   }, []);
 
   const expiresIn = useCountdown(expiresAt);
@@ -56,7 +56,7 @@ export default function ShareCard({ downloadUrl, fileName, fileSize, fileCount, 
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card>
       <CardHeader>
         <div className="flex flex-col items-center text-center gap-2">
           <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center mb-1">

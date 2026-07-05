@@ -162,6 +162,7 @@ export default function FileUpload() {
   return (
     <Card>
       <CardContent className="flex flex-col items-center gap-4">
+        <form onSubmit={(e) => { e.preventDefault(); handleUpload(); }} className="flex flex-col items-center gap-4 w-full">
         <Label
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
@@ -197,7 +198,7 @@ export default function FileUpload() {
               <p className="text-xs text-muted-foreground">
                 {files.length} file{files.length > 1 ? 's' : ''} ({formatSize(totalSize)})
               </p>
-              <Button variant="ghost" size="xs" onClick={() => setFiles([])}>
+              <Button type="button" variant="ghost" size="xs" onClick={() => setFiles([])}>
                 Clear all
               </Button>
             </div>
@@ -226,6 +227,7 @@ export default function FileUpload() {
                     <p className="text-xs text-muted-foreground">{formatSize(f.size)}</p>
                   </div>
                   <Button
+                    type="button"
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => removeFile(i)}
@@ -309,7 +311,7 @@ export default function FileUpload() {
         )}
 
         <Button
-          onClick={handleUpload}
+          type="submit"
           disabled={!files.length || uploading}
           className="w-full"
           size="lg"
@@ -320,6 +322,7 @@ export default function FileUpload() {
               ? `Upload ${files.length} files`
               : 'Upload File'}
         </Button>
+        </form>
       </CardContent>
     </Card>
   );
