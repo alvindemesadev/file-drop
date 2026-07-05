@@ -39,9 +39,24 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` (or whatever port is free) on any device connected to the same network.
+Open `http://localhost:3001` (or whatever port the terminal shows) on any device connected to the same network.
 
-To share from a specific LAN IP, the dev server already advertises the network URL in the terminal output. The allowed origin is configured in `next.config.ts`.
+To share from a specific LAN IP, the dev server already advertises the network URL in the terminal output.
+
+### Production on LAN
+
+```bash
+npm run serve
+```
+
+This builds the app and serves it on `http://0.0.0.0:3001`. Other devices on the same network connect to `http://<YOUR_LAN_IP>:3001`.
+
+If port 3001 is taken, change it:
+
+```bash
+# next start -p <port>
+npx next start -H 0.0.0.0 -p 8080
+```
 
 ## Usage
 
