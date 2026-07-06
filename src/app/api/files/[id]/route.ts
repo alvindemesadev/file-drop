@@ -52,7 +52,7 @@ export async function GET(
 
   return new NextResponse(buffer, {
     headers: {
-      'Content-Type': 'application/octet-stream',
+      'Content-Type': record.mimeType || 'application/octet-stream',
       'Content-Disposition': encodeFilename(record.originalName),
       'Content-Length': String(buffer.length),
       'X-Expires-At': record.expiresAt,
