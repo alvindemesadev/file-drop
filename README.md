@@ -58,6 +58,40 @@ PORT=8080 npm run serve    # Mac/Linux
 $env:PORT=8080; npm run serve  # Windows PowerShell
 ```
 
+### Auto-start on Windows (PM2)
+
+To keep FileDrop running in the background across reboots without a terminal window:
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Build for production
+npm run build
+
+# Start Next.js directly via PM2 (port 3001)
+pm2 start node_modules/next/dist/bin/next --name file-drop -- start -H 0.0.0.0 -p 3001
+
+# Save the process list for resurrect on boot
+pm2 save
+
+# Create a silent startup script (Windows only)
+$startup = [Environment]::GetFolderPath('Startup')
+Set-Content "$startup\file-drop.vbs" 'CreateObject("WScript.Shell").Run "cmd /c pm2 resurrect", 0, False'
+```
+
+The server will start automatically when you log in, running in the background with no visible terminal.
+
+**Useful PM2 commands:**
+
+| Command | Purpose |
+|---------|---------|
+| `pm2 status` | Check if FileDrop is running |
+| `pm2 logs file-drop` | View server logs |
+| `pm2 restart file-drop` | Restart after updates |
+| `pm2 delete file-drop` | Stop and remove |
+| `pm2 save` | Save current process list for resurrect |
+
 ## Usage
 
 ### Sending files
