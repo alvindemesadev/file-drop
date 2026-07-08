@@ -18,8 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import ShareCard from './ShareCard';
-
-const MAX_SIZE = 1024 * 1024 * 1024; // 1GB
+import { MAX_FILE_SIZE } from '@/lib/limits';
 
 function formatSize(bytes: number) {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
@@ -34,8 +33,13 @@ const expiryLabels: Record<string, string> = {
   '168': '7 days',
 };
 
+interface FileItem {
+  id: string;
+  file: File;
+}
+
 export default function FileUpload() {
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<FileItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [speed, setSpeed] = useState('');
@@ -63,13 +67,16 @@ export default function FileUpload() {
     setResult(null);
     setError('');
     const incoming = Array.from(list);
-    const oversized = incoming.find((f) => f.size > MAX_SIZE);
+    const oversized = incoming.find((f) => f.size > MAX_FILE_SIZE);
     if (oversized) {
       setError(`"${oversized.name}" exceeds the 1GB limit`);
       toast.error(`"${oversized.name}" exceeds the 1GB limit`);
       return;
     }
-    setFiles((prev) => [...prev, ...incoming]);
+    setFiles((prev) => [
+      ...prev,
+      ...incoming.map((file) => ({ id: crypto.randomUUID(), file })),
+    ]);
   }, []);
 
   const removeFile = useCallback((index: number) => {
@@ -103,7 +110,7 @@ export default function FileUpload() {
     const formData = new FormData();
     formData.append('expiryHours', expiryHours);
     if (password) formData.append('password', password);
-    for (const f of files) {
+    for (const { file: f } of files) {
       formData.append('files', f);
     }
 
@@ -157,7 +164,7 @@ export default function FileUpload() {
     return <ShareCard {...result} onReset={() => setResult(null)} />;
   }
 
-  const totalSize = files.reduce((s, f) => s + f.size, 0);
+  const totalSize = files.reduce((s, f) => s + f.file.size, 0);
 
   return (
     <Card>
@@ -203,9 +210,9 @@ export default function FileUpload() {
               </Button>
             </div>
             <div className="space-y-1 max-h-48 overflow-y-auto">
-              {files.map((f, i) => (
+              {files.map((item, i) => (
                 <div
-                  key={i}
+                  key={item.id}
                   draggable
                   onDragStart={() => setDragIdx(i)}
                   onDragOver={(e) => { e.preventDefault(); }}
@@ -223,8 +230,8 @@ export default function FileUpload() {
                   <GripVertical className="size-4 shrink-0 text-muted-foreground/30 hidden sm:block" />
                   <File className="size-5 shrink-0 text-muted-foreground" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm truncate">{f.name}</p>
-                    <p className="text-xs text-muted-foreground">{formatSize(f.size)}</p>
+                    <p className="text-sm truncate">{item.file.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatSize(item.file.size)}</p>
                   </div>
                   <Button
                     type="button"

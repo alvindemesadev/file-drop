@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
+import fs from 'fs';
+import fsPromises from 'fs/promises';
+import { Readable } from 'stream';
 import path from 'path';
 import crypto from 'crypto';
 import { getFileRecord } from '@/lib/store';
+
+export const runtime = 'nodejs';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
@@ -26,7 +30,8 @@ export async function GET(
     return NextResponse.json({ error: 'File has expired' }, { status: 410 });
   }
 
-  const password = request.nextUrl.searchParams.get('password');
+  const password =
+    request.headers.get('x-password') || request.nextUrl.searchParams.get('password');
   if (record.passwordHash) {
     if (!password) {
       return NextResponse.json(
@@ -43,18 +48,20 @@ export async function GET(
   const filePath = path.join(UPLOAD_DIR, id, record.originalName);
 
   try {
-    await fs.access(filePath);
+    await fsPromises.access(filePath);
   } catch {
     return NextResponse.json({ error: 'File not found on disk' }, { status: 404 });
   }
 
-  const buffer = await fs.readFile(filePath);
+  const stat = await fsPromises.stat(filePath);
+  const nodeStream = fs.createReadStream(filePath);
+  const stream = Readable.toWeb(nodeStream) as ReadableStream;
 
-  return new NextResponse(buffer, {
+  return new NextResponse(stream, {
     headers: {
       'Content-Type': record.mimeType || 'application/octet-stream',
       'Content-Disposition': encodeFilename(record.originalName),
-      'Content-Length': String(buffer.length),
+      'Content-Length': String(stat.size),
       'X-Expires-At': record.expiresAt,
       'X-File-Count': String(record.fileCount),
       'X-Has-Password': String(!!record.passwordHash),

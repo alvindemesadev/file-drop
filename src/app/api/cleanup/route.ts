@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { deleteExpiredFiles } from '@/lib/store';
 
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     const deleted = await deleteExpiredFiles();

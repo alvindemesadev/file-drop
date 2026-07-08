@@ -5,6 +5,8 @@ import crypto from 'crypto';
 import { ZipArchive } from 'archiver';
 import { saveFileRecord, generateAccessCode, MAX_FILE_SIZE, MAX_UPLOAD_SIZE } from '@/lib/store';
 
+export const runtime = 'nodejs';
+
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
 function guessMime(name: string): string {

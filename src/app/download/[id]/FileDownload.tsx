@@ -80,10 +80,34 @@ export default function FileDownload({ id }: { id: string }) {
     }
   };
 
-  const downloadUrl = authenticated && hasPassword
-    ? `/api/files/${id}?password=${encodeURIComponent(password)}`
-    : `/api/files/${id}`;
   const expiresIn = useCountdown(expiresAt);
+
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(`/api/files/${id}`, {
+        headers: hasPassword ? { 'x-password': password } : undefined,
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg = data.error || 'Download failed';
+        toast.error(msg);
+        if (res.status === 401 || res.status === 403) {
+          setAuthenticated(false);
+          setInfo({ needsPassword: true });
+        }
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Download failed');
+    }
+  };
 
   return (
     <div className="w-full max-w-lg mx-auto px-4 py-12">
@@ -168,11 +192,9 @@ export default function FileDownload({ id }: { id: string }) {
             </div>
           </CardHeader>
           <CardContent>
-            <a href={downloadUrl} download={fileName}>
-              <Button className="w-full" size="lg">
-                <Download className="size-4" /> Download File
-              </Button>
-            </a>
+            <Button className="w-full" size="lg" onClick={handleDownload}>
+              <Download className="size-4" /> Download File
+            </Button>
           </CardContent>
         </Card>
       )}

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFileRecordByCode } from '@/lib/store';
 
+export const runtime = 'nodejs';
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ code: string }> }

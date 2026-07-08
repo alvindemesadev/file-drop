@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { getFileRecord } from '@/lib/store';
 
+export const runtime = 'nodejs';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -13,8 +15,8 @@ export async function POST(
     return NextResponse.json({ error: 'File not found' }, { status: 404 });
   }
 
-  const body = await request.json();
-  const password = body.password as string;
+  const body = await request.json().catch(() => ({}));
+  const password = (body.password as string) ?? '';
 
   if (record.passwordHash) {
     const hash = crypto.createHash('sha256').update(password).digest('hex');

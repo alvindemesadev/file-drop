@@ -1,21 +1,31 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { MAX_FILE_SIZE, MAX_UPLOAD_SIZE } from './limits';
+
+export { MAX_FILE_SIZE, MAX_UPLOAD_SIZE };
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'files.db');
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
-export const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1GB
-export const MAX_UPLOAD_SIZE = 2 * 1024 * 1024 * 1024; // 2GB (accounts for multipart overhead)
-
 let db: Database.Database;
+let cleanupTimer: NodeJS.Timeout | null = null;
+
+function startCleanupTimer() {
+  if (cleanupTimer) return;
+  cleanupTimer = setInterval(() => {
+    deleteExpiredFiles().catch(() => {});
+  }, 60 * 60 * 1000);
+  cleanupTimer.unref?.();
+}
 
 function getDb(): Database.Database {
   if (!db) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
     db = new Database(DB_FILE);
     db.pragma('journal_mode = WAL');
+    startCleanupTimer();
     db.exec(`
       CREATE TABLE IF NOT EXISTS files (
         id TEXT PRIMARY KEY,
