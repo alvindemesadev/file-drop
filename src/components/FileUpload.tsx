@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import ShareCard from './ShareCard';
 import { MAX_FILE_SIZE } from '@/lib/limits';
+import { generateId } from '@/lib/utils';
 
 function formatSize(bytes: number) {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
@@ -75,7 +76,7 @@ export default function FileUpload() {
     }
     setFiles((prev) => [
       ...prev,
-      ...incoming.map((file) => ({ id: crypto.randomUUID(), file })),
+      ...incoming.map((file) => ({ id: generateId(), file })),
     ]);
   }, []);
 
